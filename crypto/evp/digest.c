@@ -1017,7 +1017,8 @@ int EVP_MD_up_ref(EVP_MD *md)
 {
     int ref = 0;
 
-    CRYPTO_UP_REF(&md->refcnt, &ref, md->lock);
+    if (md->origin != EVP_ORIG_GLOBAL)
+        CRYPTO_UP_REF(&md->refcnt, &ref, md->lock);
     return 1;
 }
 
@@ -1025,8 +1026,11 @@ void EVP_MD_free(EVP_MD *md)
 {
     int i;
 
-    if (md == NULL)
+    if (md == NULL || md->origin == EVP_ORIG_GLOBAL)
         return;
+    if (md->origin == EVP_ORIG_METH) {
+        /* EVP_MD_meth_free just calls this function. */
+    }
 
     CRYPTO_DOWN_REF(&md->refcnt, &i, md->lock);
     if (i > 0)
