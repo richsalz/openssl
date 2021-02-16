@@ -1568,7 +1568,8 @@ int EVP_CIPHER_up_ref(EVP_CIPHER *cipher)
 {
     int ref = 0;
 
-    CRYPTO_UP_REF(&cipher->refcnt, &ref, cipher->lock);
+    if (cipher->origin != EVP_ORIG_GLOBAL)
+        CRYPTO_UP_REF(&cipher->refcnt, &ref, cipher->lock);
     return 1;
 }
 
@@ -1576,8 +1577,11 @@ void EVP_CIPHER_free(EVP_CIPHER *cipher)
 {
     int i;
 
-    if (cipher == NULL || cipher->prov == NULL)
+    if (cipher == NULL || cipher->origin == EVP_ORIG_GLOBAL)
         return;
+    if (cipher->origin == EVP_ORIG_METH) {
+        /* EVP_CIPHER_meth_free just calls this function. */
+    }
 
     CRYPTO_DOWN_REF(&cipher->refcnt, &i, cipher->lock);
     if (i > 0)
