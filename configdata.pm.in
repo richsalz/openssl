@@ -1,5 +1,26 @@
 #! {- $config{HASHBANGPERL} -}
-# -*- mode: perl -*-
+# Copyright 2021 The OpenSSL Project Authors. All Rights Reserved.
+#
+# Licensed under the Apache License 2.0 (the "License").  You may not use
+# this file except in compliance with the License.  You can obtain a copy
+# in the file LICENSE in the source distribution or at
+# https://www.openssl.org/source/license.html
+#
+{-
+    $OUT = "# Do not ";
+    $OUT .= "edit this file; ";
+    $OUT .= "it was generated during the OpenSSL configuration.\n";
+-}
+use strict;
+use warnings;
+
+package configdata;
+use Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT = qw(
+    %config %target %disabled %withargs %unified_info
+    @disablables @disablables_int
+);
 {-
  sub out_item {
      my $ref = shift;
@@ -74,24 +95,18 @@
      return abs_path(catfile($config{sourcedir}, @_));
  }
 -}
-package configdata;
-
-use strict;
-use warnings;
-
-use Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT = qw(
-    %config %target %disabled %withargs %unified_info
-    @disablables @disablables_int
-);
-
 our %config = ({- out_item(\%config); -});
+
 our %target = ({- out_item(\%target); -});
+
 our @disablables = ({- out_item(\@disablables) -});
+
 our @disablables_int = ({- out_item(\@disablables_int) -});
+
 our %disabled = ({- out_item(\%disabled); -});
+
 our %withargs = ({- out_item(\%withargs); -});
+
 our %unified_info = ({- out_item(\%unified_info); -});
 
 # Unexported, only used by OpenSSL::Test::Utils::available_protocols()
